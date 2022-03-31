@@ -3,9 +3,9 @@ import { FormattedMessage } from 'react-intl';
 import ModalUser from './ModalUser';
 import './UserManage.scss'
 import { connect } from 'react-redux';
-import { getAllUsers, createNewUserService } from '../../services/userService'
-
-
+import { getAllUsers, createNewUserService, deleteUserService, editUserService } from '../../services/userService'
+import ModalEditUser from './ModalEditUser';
+import { emitter } from '../../utils/emitter';
 class UserManage extends Component {
 
     constructor(props) {
@@ -13,6 +13,9 @@ class UserManage extends Component {
         this.state = {
             arruser: [],
             isOpenModalUser: false,
+            isOpenModalEditUser: false,
+
+            userEdit: {}
         }
     }
 
@@ -39,6 +42,13 @@ class UserManage extends Component {
         });
     }
 
+    toggleEditUser = () => {
+        this.setState({
+            isOpenModalEditUser: !this.state.isOpenModalEditUser
+        });
+    }
+
+
     createNewUser = async (data) => {
         try {
             let response = await createNewUserService(data);
@@ -49,6 +59,8 @@ class UserManage extends Component {
                 this.setState({
                     isOpenModalUser: false
                 });
+
+                emitter.emit('EVENT_CLEAR_MODAL_DATA')
             }
             console.log('check response :', response);
         } catch (e) {
@@ -58,6 +70,44 @@ class UserManage extends Component {
 
     }
 
+    handleDeleteUser = async (user) => {
+        try {
+            console.log("user.id :", user.id);
+            let res = await deleteUserService(user.id)
+            if (res && res.errCode === 0) { // xóa thành công user thì tự động get lại danh sách user   
+                await this.getAllUserFromReact();
+            } else {
+                alert(res.errMessage)
+            }
+        } catch (e) {
+            console.log(e);
+        }
+    }
+    handleSaveUser = (user) => {
+        console.log('check user :', user);
+        this.setState({
+            isOpenModalEditUser: true,
+            userEdit: user
+        });
+    }
+
+    doEditUser = async (user) => {
+        try {
+            let res = await editUserService(user);
+            if (res && res.errCode === 0) {
+                this.setState({
+                    isOpenModalEditUser: false
+                });
+                await this.getAllUserFromReact();
+            } else {
+                alert(res.errCode)
+            }
+        } catch (e) {
+            console.log(e);
+        }
+
+
+    }
 
     render() {
         console.log('check render ', this.state)
@@ -68,9 +118,18 @@ class UserManage extends Component {
                     isOpen={this.state.isOpenModalUser}
                     toggle={this.toggle}
                     createNewUser={this.createNewUser}
-
-
                 />
+                {
+                    this.state.isOpenModalEditUser && // câu điều kiện :
+                    // nếu isOpenModalEditUser=true thì in ra và ngược lại
+                    <ModalEditUser
+                        isOpen={this.state.isOpenModalEditUser}
+                        toggleEditUser={this.toggleEditUser}
+                        currentUser={this.state.userEdit}
+                        eEditUser={this.doEditUser}
+
+                    />
+                }
                 <div className='title text-center'>User users with Dinh Ly</div>
                 <div className='mx-1'>
                     <button className='btn btn-primary px-3'
@@ -96,8 +155,8 @@ class UserManage extends Component {
                                         <td>{item.lastName}</td>
                                         <td>{item.address}</td>
                                         <td>
-                                            <button className='btn-edit'><i className="fas fa-pencil-alt"></i></button>
-                                            <button className='btn-delete'><i className="fas fa-trash"></i></button>
+                                            <button className='btn-edit' onClick={() => { this.handleSaveUser(item) }}><i className="fas fa-pencil-alt"></i></button>
+                                            <button className='btn-delete' onClick={() => { this.handleDeleteUser(item) }}><i className="fas fa-trash"></i></button>
                                         </td>
                                     </tr>
                                 )
