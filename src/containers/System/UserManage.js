@@ -72,7 +72,7 @@ class UserManage extends Component {
 
     handleDeleteUser = async (user) => {
         try {
-            console.log("user.id :", user.id);
+
             let res = await deleteUserService(user.id)
             if (res && res.errCode === 0) { // xóa thành công user thì tự động get lại danh sách user   
                 await this.getAllUserFromReact();

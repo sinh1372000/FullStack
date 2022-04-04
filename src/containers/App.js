@@ -16,6 +16,7 @@ import Login from './Auth/Login';
 
 import Header from './Header/Header';
 import System from '../routes/System';
+import HomePage from './HomePage/HomePage.js'
 // import System from '../routes/System';
 
 
@@ -55,6 +56,7 @@ class App extends Component {
                                 <Route path={path.HOME} exact component={(Home)} />
                                 <Route path={path.LOGIN} component={userIsNotAuthenticated(Login)} />
                                 <Route path={path.SYSTEM} component={userIsAuthenticated(System)} />
+                                <Route path={path.HOMEPAGE} component={HomePage} />
                             </Switch>
                         </span>
 
@@ -72,7 +74,7 @@ class App extends Component {
 }
 
 const mapStateToProps = state => {
-    return {    
+    return {
         started: state.app.started,
         isLoggedIn: state.user.isLoggedIn
     };
