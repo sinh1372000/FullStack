@@ -66,10 +66,10 @@ class HomeHeader extends Component {
                             <input type='text' placeholder='Tìm chuyên khoa khám bệnh' />
                         </div>
                         <div className='app-link'>
-                            <a href="https://bookingcare.vn/app/android">
+                            <a target='blank' href="https://play.google.com/store?hl=en&gl=US">
                                 <img src={logogoogle}></img>
                             </a>
-                            <a href="https://bookingcare.vn/app/ios">
+                            <a target='blank' href="https://www.apple.com/app-store/">
                                 <img src={logoapple}></img>
                             </a>
                         </div>
